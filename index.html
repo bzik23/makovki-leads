@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>לידים מקובקי</title>
+<style>:root{color-scheme:light} body{margin:0} img{max-width:100%} [hidden]{display:none!important}</style>
+</head>
+<body>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one RTL column. Summary tiles per source, then a filter bar, then the full ledger table. Data columns in mono. */
+:root{
+  --bg:#f4f5f8; --surface:#ffffff; --fg:#141a2e; --muted:#5d657c; --line:#d9dde8;
+  --accent:#0f2a5c; --accent-fg:#ffffff; --soft:#e4eaf6;
+  --ok:#1b7a3d; --ok-bg:#e3f3e8; --warn:#8a5a00; --warn-bg:#fbf0d6; --bad:#8b2232; --bad-bg:#f8e3e6;
+  --font:"Heebo",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1322; --surface:#171c2f; --fg:#e8ebf4; --muted:#9aa3bd; --line:#2b3350;
+  --accent:#8fb0ee; --accent-fg:#0f1322; --soft:#1f2a47;
+  --ok:#6fd392; --ok-bg:#163523; --warn:#f0c060; --warn-bg:#3b2d0c; --bad:#f08a98; --bad-bg:#3d1620; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1322; --surface:#171c2f; --fg:#e8ebf4; --muted:#9aa3bd; --line:#2b3350;
+  --accent:#8fb0ee; --accent-fg:#0f1322; --soft:#1f2a47;
+  --ok:#6fd392; --ok-bg:#163523; --warn:#f0c060; --warn-bg:#3b2d0c; --bad:#f08a98; --bad-bg:#3d1620; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5;direction:rtl;margin:0}
+.wrap{max-width:1240px;margin-inline:auto;padding-inline:16px;padding-block:28px 48px;display:grid;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font-size:30px;font-weight:800;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+.stamp{font-family:var(--mono);font-size:12px;color:var(--muted);direction:ltr;text-align:right}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer;text-align:right;font:inherit;color:inherit;transition:border-color .15s}
+.tile:hover{border-color:var(--accent)}
+.tile[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.tile .k{font-size:12px;color:var(--muted);display:block;line-height:1.3}
+.tile .v{font-family:var(--mono);font-size:26px;font-weight:500;line-height:1.1;margin-top:6px;font-variant-numeric:tabular-nums}
+.tile .r{font-size:11.5px;color:var(--muted);margin-top:4px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.bar input[type=search]{flex:1 1 220px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);font:inherit}
+.bar input:focus-visible,.tile:focus-visible,.chk:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none}
+.count{font-family:var(--mono);font-size:13px;color:var(--muted);margin-inline-start:auto;font-variant-numeric:tabular-nums}
+.tablewrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:900px}
+th,td{padding:9px 10px;text-align:right;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-size:12px;color:var(--muted);font-weight:500;letter-spacing:.02em;background:var(--soft);position:sticky;top:0;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.d,td.p,td.e{font-family:var(--mono);font-size:13px;direction:ltr;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.e{max-width:230px;overflow:hidden;text-overflow:ellipsis}
+td.n{font-weight:700;white-space:nowrap}
+td.m{color:var(--muted);font-size:13.5px;max-width:380px;min-width:0}
+td.pg{font-family:var(--mono);font-size:12px;direction:ltr;text-align:right;color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--accent);white-space:nowrap;font-weight:500}
+.st{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:999px;white-space:nowrap;font-weight:500}
+.st.real{background:var(--ok-bg);color:var(--ok)} .st.spam{background:var(--bad-bg);color:var(--bad)} .st.test{background:var(--warn-bg);color:var(--warn)}
+tr.spam td,tr.test td{opacity:.72}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.panel{display:grid;gap:14px;padding-top:10px;border-top:2px solid var(--accent)}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:12px}
+.sec-head .count{margin-inline-start:0;font-size:14px}
+td.idx{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:center;width:36px}
+.na{color:var(--muted);font-size:12.5px}
+a.tile{text-decoration:none;color:inherit;display:block}
+.panel h2{font-size:20px;margin:0;font-weight:800;text-wrap:balance}
+.panel .lead{margin:-8px 0 0;color:var(--muted);max-width:70ch}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.kpi .k{font-size:12px;color:var(--muted);line-height:1.3}
+.kpi .v{font-family:var(--mono);font-size:26px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .r{font-size:11.5px;color:var(--muted)}
+.tablewrap.small table{min-width:700px}
+.weeks td{font-size:13.5px;font-variant-numeric:tabular-nums}
+.weeks td:nth-child(2){font-family:var(--mono);font-weight:500}
+.fine{margin:0;padding-inline-start:18px;display:grid;gap:5px;color:var(--muted);font-size:13.5px;max-width:95ch}
+.fine b{color:var(--fg);font-weight:600}
+@media (max-width:640px){h1{font-size:24px} .tile .v{font-size:22px}}
+@media (prefers-reduced-motion:reduce){.tile{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>לידים מקובקי</h1>
+      <p class="sub">ספטמבר עד אוקטובר 2026. כל הפניות למקובקי שירותי מדידה שהגיעו לתיבה bzik23@gmail.com, ולצידן ספירת הוואטסאפים והשיחות מהדוחות שקיימים. לחיצה על אריח מסננת לפי מקור.</p>
+    </div>
+    <div class="stamp" id="stamp"></div>
+  </header>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="bar">
+    <input type="search" id="q" placeholder="חיפוש לפי שם, טלפון, מייל או טקסט" aria-label="חיפוש">
+    <label class="chk"><input type="checkbox" id="showTest"> הצג בדיקות</label>
+  </div>
+
+  <section class="panel" id="sec-facebook">
+    <div class="sec-head"><h2>לידים מפייסבוק ואינסטגרם (דרך YouLead)</h2><span class="count" id="count-facebook"></span></div>
+    <p class="lead">כל ליד שחן שלחה במייל "מקובקי - לידים מפייסבוק", כולל לידים שהופיעו רק בציטוט בתוך תשובה. המייל של חן לא מציין אם הליד הגיע מפייסבוק או מאינסטגרם, ולכן עמודת הפלטפורמה ריקה.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>תאריך</th><th>שם</th><th>טלפון</th><th>מייל</th><th>פלטפורמה</th><th>הערה</th><th>סטטוס</th>
+        </tr></thead>
+        <tbody id="rows-facebook"></tbody>
+      </table>
+      <div class="empty" id="empty-facebook" hidden>אין לידים שתואמים לחיפוש.</div>
+    </div>
+  </section>
+
+  <section class="panel" id="sec-site">
+    <div class="sec-head"><h2>פניות מהאתר makovki.com</h2><span class="count" id="count-site"></span></div>
+    <p class="lead">טופס האתר החדש. מגיע מגוגל אורגני, מגוגל ממומן או ישירות, והמייל לא מבחין ביניהם.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th>#</th><th>תאריך</th><th>שם</th><th>טלפון</th><th>מייל</th><th>שירות מבוקש</th><th>פרטי הפרויקט</th><th>סטטוס</th>
+        </tr></thead>
+        <tbody id="rows-site"></tbody>
+      </table>
+      <div class="empty" id="empty-site" hidden>אין פניות שתואמות לחיפוש.</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>וואטסאפים ושיחות, ספירה בלבד</h2>
+    <p class="lead">בערוצים האלה לא מגיעים שם או מספר למייל. אלה הכמויות שקיימות בדוחות שהגיעו לתיבה.</p>
+    <div class="kpis">
+      <div class="kpi"><span class="k">פייסבוק, קמפיין וואטסאפ (CTW)</span><span class="v">2,572</span><span class="r">קליקים לוואטסאפ בספטמבר · 798 ₪ · דוח YouLead</span></div>
+      <div class="kpi"><span class="k">פייסבוק, קמפיין לידים</span><span class="v">30</span><span class="r">לידים בספטמבר לפי הדוח · 62 ₪ לליד · 11 מהם הגיעו למייל</span></div>
+      <div class="kpi"><span class="k">גוגל אדס, המרות</span><span class="v">92</span><span class="r">30/08 עד 03/10 · סיכומים שבועיים · הסוג לא מפורט</span></div>
+      <div class="kpi"><span class="k">לחיצות וואטסאפ וטלפון באתר</span><span class="v">?</span><span class="r">נמדד רק ב-Google Analytics, אין גישה מהמייל</span></div>
+    </div>
+    <div class="tablewrap small">
+      <table class="weeks">
+        <thead><tr><th>שבוע</th><th>המרות</th><th>קליקים</th><th>חיפוש: אדריכלים ומעצבי פנים</th><th>PMAX #2</th><th>חיפוש: חנויות עסקים</th></tr></thead>
+        <tbody>
+          <tr><td>30/08 עד 05/09</td><td>3</td><td>137</td><td>3 המרות · 135 קליקים</td><td>לא פעיל</td><td>0 · 2 קליקים</td></tr>
+          <tr><td>06/09 עד 12/09</td><td>10</td><td>289</td><td>10 המרות · 285 קליקים</td><td>לא פעיל</td><td>0 · 4 קליקים</td></tr>
+          <tr><td>13/09 עד 19/09</td><td>7</td><td>~1,000</td><td>7 המרות · 151 קליקים</td><td>0 · ~1,000 קליקים</td><td>0 · 5 קליקים</td></tr>
+          <tr><td>20/09 עד 26/09</td><td>39</td><td>~3,000</td><td>14 המרות · 61 קליקים</td><td>25 המרות · ~3,000 קליקים</td><td>0 · 5 קליקים</td></tr>
+          <tr><td>27/09 עד 03/10</td><td>33</td><td>~5,000</td><td>9 המרות · 56 קליקים</td><td>24 המרות · ~5,000 קליקים</td><td>0 · 2 קליקים</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="fine">
+      <li><b>גוגל אדס</b>: "המרות" בסיכום השבועי כוללות את כל פעולות ההמרה שהוגדרו בחשבון (לחיצת וואטסאפ, לחיצת טלפון, שליחת טופס). המייל לא מפרט כמה מכל סוג. הפירוט קיים רק בתוך חשבון גוגל אדס 432-942-6795.</li>
+      <li><b>פייסבוק ואינסטגרם</b>: הדוח של YouLead מונה 30 לידים בספטמבר, אבל במייל הגיעו 11. ההעברה במייל התחילה ב-14/09, ולפחות ליד אחד נשלח רק לעודד. שאר הלידים נמצאים במרכז הלידים של מטא. טופס הלידים של מטא שומר לכל ליד את שדה הפלטפורמה (fb או ig), אבל חן לא מעבירה אותו במייל. כדי שהעמודה תתמלא צריך לבקש ממנה להוסיף את השדה.</li>
+      <li><b>האתר</b>: לחיצות על וואטסאפ ועל הטלפון נרשמות כאירוע contact_click ב-Google Analytics (נכס G-TZBCNP9R3F). אין לי גישה לנכס, ולכן אין כאן מספר. גם שיחות שנכנסו ישירות לטלפון של עודד אינן נמדדות באף מקום.</li>
+      <li><b>אורגני מול ממומן</b>: מייל הטופס לא מציין מאיפה הגולש הגיע, ולכן פניות מהאתר מוצגות יחד.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const DATA = [{"d": "2026-10-05 05:56", "s": "site_new", "n": "צחי סקאנר לייט", "p": "0523671603", "e": "TZAHIS100@GMAIL.COM", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "נכס 770 מטר תעשיה", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-10-05 02:47", "s": "facebook", "n": "กำพล พรมยาลี", "p": "+66823759423", "e": "bigc25311@gmail.com", "sv": "", "m": "", "pg": "", "nt": "המייל המקורי נשלח רק לעודד; נלקח מהציטוט בתשובה של חן. מספר תאילנדי", "st": "real"}, {"d": "2026-10-02 05:35", "s": "site_new", "n": "הודיה לוי", "p": "0548014111", "e": "arc.hodaya@gmail.com", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-09-27 09:36", "s": "site_new", "n": "עידן חליוה", "p": "0545254927", "e": "idanhaliva85@gmail.com", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "בית פרטי באשדוד לפני שיפוץ כללי כולל שטחי חוץ", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-09-26 07:57", "s": "site_new", "n": "ברק כהן", "p": "0542567286", "e": "barakcohen78@gmail.com", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-09-26 02:05", "s": "facebook", "n": "Ramashish Nisad", "p": "+972505406575", "e": "ramashish711@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-25 06:07", "s": "facebook", "n": "גלית בן שחר", "p": "+972507443328", "e": "g.benshahar@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-25 04:39", "s": "facebook", "n": "Chen Ben Shitrit", "p": "+972542647116", "e": "chen20796@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-24 12:23", "s": "site_new", "n": "אילן אביטל", "p": "0525225050", "e": "ilan@fervital.co.il", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-09-24 05:57", "s": "facebook", "n": "Lili Mimran", "p": "+972507666062", "e": "lili.shaike@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-24 03:15", "s": "facebook", "n": "Lev Altgovzen", "p": "+972506501615", "e": "altgovls@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-24 02:17", "s": "facebook", "n": "Sara Licht", "p": "+972537716062", "e": "tzvihuck@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-23 21:47", "s": "facebook", "n": "גורי שלמה", "p": "+972509096026", "e": "tadmit.hadasha@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-23 09:49", "s": "facebook", "n": "Rami Odeh", "p": "+972543116227", "e": "rami.od307@gmail.com", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-23 07:43", "s": "site_new", "n": "לירז מסקטו", "p": "054-7077750", "e": "lirazm@me.com", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "מדידה של בית פרטי ישן, קיימת גרמושקה של הבית אבל צריך לדייק אותה + עליית גג", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-09-18 16:36", "s": "facebook", "n": "wegdan", "p": "+972526720448", "e": "", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-14 18:03", "s": "facebook", "n": "דן אטיאס", "p": "+972525715715", "e": "dana@bdo.co.il", "sv": "", "m": "", "pg": "", "nt": "", "st": "real"}, {"d": "2026-09-14 09:35", "s": "facebook", "n": "בדיקה", "p": "+972542665670", "e": "chen@youlead.co.il", "sv": "", "m": "", "pg": "", "nt": "", "st": "test"}, {"d": "2026-09-14 07:32", "s": "site_new", "n": "אלעד שגיא", "p": "0504723228", "e": "Elad.sagi@gmail.com", "sv": "שירותי מדידה אדריכלית / מדידת פנים", "m": "מבקש הצעת מחיר למדידה טופגרפית+מדידית פנים הנכס בגלעד 47 חלקה 151/1 אלפי מנשה גודל הבית 163 מור", "pg": "/", "nt": "", "st": "real"}, {"d": "2026-09-14 04:38", "s": "facebook", "n": "בדיקה בדיקה", "p": "+972542665670", "e": "test@test.co.il", "sv": "", "m": "", "pg": "", "nt": "", "st": "test"}, {"d": "2026-09-07 22:37", "s": "site_new", "n": "מיקי דהן", "p": "0558989741", "e": "miki.d@poliva.co.il", "sv": "סימון גבולות", "m": "", "pg": "/", "nt": "", "st": "real"}];
+const SRC = {
+  site_new:   {label:"האתר החדש (טופס)", short:"אתר חדש"},
+  facebook:   {label:"פייסבוק (YouLead)", short:"פייסבוק"},
+  site_pages: {label:"אתר ישן, עמודי שירות", short:"אתר ישן · עמודים"},
+  site_contact:{label:"אתר ישן, צור קשר", short:"אתר ישן · צור קשר"},
+  google_2024:{label:"גוגל ממומן 2024 (ריף מדיה)", short:"גוגל 2024"},
+};
+const ST = {real:"פנייה", spam:"ספאם", test:"בדיקה"};
+let srcFilter = null;
+const $ = id => document.getElementById(id);
+
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+
+const SECTIONS = [
+  {id:"facebook", srcs:["facebook"], label:"פייסבוק ואינסטגרם (YouLead)"},
+  {id:"site",     srcs:["site_new"], label:"טופס האתר makovki.com"},
+];
+function buildTiles(){
+  const t = $("tiles"); t.innerHTML = "";
+  const realAll = DATA.filter(x=>x.st==="real").length;
+  const all = document.createElement("div");
+  all.className = "tile";
+  all.innerHTML = `<span class="k">כל הפניות עם פרטים</span><span class="v">${realAll}</span><span class="r">ספטמבר עד אוקטובר 2026</span>`;
+  t.appendChild(all);
+  for (const s of SECTIONS){
+    const rows = DATA.filter(x=>s.srcs.includes(x.s));
+    const real = rows.filter(x=>x.st==="real").length;
+    const dates = rows.filter(x=>x.st==="real").map(x=>x.d.slice(0,10)).sort();
+    const b = document.createElement("a");
+    b.className="tile"; b.href = "#sec-"+s.id;
+    b.innerHTML = `<span class="k">${esc(s.label)}</span><span class="v">${real}</span><span class="r">${dates.length? "מ-"+esc(fmt(dates[0]))+" עד "+esc(fmt(dates[dates.length-1])) : ""}${rows.length!==real? " · "+(rows.length-real)+" בדיקות":""}</span>`;
+    t.appendChild(b);
+  }
+}
+function fmt(iso){ return iso.slice(8,10)+"/"+iso.slice(5,7); }
+
+function render(){
+  buildTiles();
+  const q = $("q").value.trim().toLowerCase();
+  const showTest = $("showTest").checked;
+  for (const s of SECTIONS){
+    const rows = DATA.filter(x=>{
+      if (!s.srcs.includes(x.s)) return false;
+      if (x.st!=="real" && !showTest) return false;
+      if (q){
+        const hay = [x.n,x.p,x.e,x.sv,x.m,x.pg,x.nt].join(" ").toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    }).sort((a,b)=>a.d<b.d?1:-1);
+    const total = rows.length; let n = total;
+    const tb = $("rows-"+s.id);
+    tb.innerHTML = rows.map(x=>{
+      const idx = n--;
+      const nm = esc(x.n)||"<span style='color:var(--muted);font-weight:400'>ללא שם</span>";
+      const cells = s.id==="facebook"
+        ? `<td>${esc(x.pf||"")||"<span class='na'>לא צוין במייל</span>"}</td><td class="m">${esc(x.nt)}</td>`
+        : `<td>${esc(x.sv)}</td><td class="m">${esc(x.m)}</td>`;
+      return `<tr class="${x.st}">
+        <td class="idx">${idx}</td>
+        <td class="d">${esc(x.d)}</td>
+        <td class="n">${nm}</td>
+        <td class="p">${esc(x.p)}</td>
+        <td class="e" title="${esc(x.e)}">${esc(x.e)}</td>
+        ${cells}
+        <td><span class="st ${x.st}">${ST[x.st]}</span></td>
+      </tr>`;
+    }).join("");
+    $("empty-"+s.id).hidden = total>0;
+    const real = rows.filter(x=>x.st==="real").length;
+    $("count-"+s.id).textContent = real + " לידים" + (total!==real? " + "+(total-real)+" בדיקות":"");
+  }
+}
+["q","showTest"].forEach(id=>$(id).addEventListener("input", render));
+const last = DATA.map(x=>x.d).sort().pop() || "";
+$("stamp").textContent = "updated 2026-10-06 · last lead " + last.slice(0,10);
+render();
+</script>
+
+</body>
+</html>
